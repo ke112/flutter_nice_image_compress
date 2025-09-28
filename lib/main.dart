@@ -124,16 +124,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               const SizedBox(height: 12),
-              if (_state.originalFile != null)
-                _buildPreviewCard(context, file: _state.originalFile!, bytes: _state.originalBytes, title: '原图'),
-              const SizedBox(height: 12),
-              if (_state.compressedFile != null)
-                _buildPreviewCard(
-                  context,
-                  file: _state.compressedFile!,
-                  bytes: _state.compressedBytes,
-                  title: '压缩图 (质量 ${_state.qualityUsed})',
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_state.originalFile != null)
+                    _buildPreviewCard(context, file: _state.originalFile!, bytes: _state.originalBytes, title: '原图'),
+                  if (_state.compressedFile != null)
+                    _buildPreviewCard(
+                      context,
+                      file: _state.compressedFile!,
+                      bytes: _state.compressedBytes,
+                      title: '压缩图 (质量 ${_state.qualityUsed})',
+                    ),
+                ],
+              ),
               if (_state.compressedFile != null) ...[const SizedBox(height: 12), _buildStatsCard(context)],
               const SizedBox(height: 20),
               Row(
@@ -205,13 +209,14 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('$title  •  ${kb.toStringAsFixed(1)} KB'),
+              Text(title),
+              Text('${kb.toStringAsFixed(1)} KB'),
               const SizedBox(height: 8),
-              Image.file(file, height: 150, fit: BoxFit.contain),
+              Image.file(file, width: 170, fit: BoxFit.contain),
               const SizedBox(height: 8),
               Row(
                 children: [

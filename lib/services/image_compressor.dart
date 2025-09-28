@@ -7,9 +7,16 @@ import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 
 class ImageCompressorResult {
+  /// 压缩后文件
   final File file;
+
+  /// 压缩后大小，单位：字节
   final int bytes;
+
+  /// 压缩后质量，0-100
   final int qualityUsed;
+
+  /// 压缩后图片信息
   final SizeInfo sizeInfo;
 
   ImageCompressorResult({required this.file, required this.bytes, required this.qualityUsed, required this.sizeInfo});

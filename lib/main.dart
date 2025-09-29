@@ -216,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Text(title),
               Text('${kb.toStringAsFixed(1)} KB'),
               const SizedBox(height: 8),
-              Image.file(file, width: 170, fit: BoxFit.contain),
+              Image.file(file, width: 100, fit: BoxFit.contain),
               const SizedBox(height: 8),
               Row(
                 children: [

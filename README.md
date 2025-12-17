@@ -1,83 +1,234 @@
-# flutter_image_compress
+# high_effort_image_compress
 
-🚀 The Ultimate Flutter Image Compression Tool
-Simply set a maximum file size, and our smart algorithm instantly delivers images with the smallest size and the highest clarity.
-Perfect for profile uploads, gallery images, or bulk processing—make your app faster, lighter, and more professional.
-✨ Try it once, and you’ll keep coming back to it.
+[![pub package](https://img.shields.io/pub/v/high_effort_image_compress.svg)](https://pub.dev/packages/high_effort_image_compress)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-🚀 Flutter 最佳图片压缩利器
-轻松设定图片的最大文件大小，智能算法在瞬间为你输出体积最小、清晰度最高的压缩结果。
-无论是上传头像、相册图片，还是海量批量处理，都能让你的应用更快、更省、更专业。
-✨ 用过一次，你一定会想再次使用它。
+A powerful Flutter plugin for advanced image compression with intelligent algorithms that balance size and quality.
 
-## Compression Principles
+一个强大的 Flutter 图片压缩插件，采用智能算法在大小和质量之间取得平衡。
 
-本项目的压缩策略以“尽量接近且不超过目标大小”为硬标准，并在稳定性与速度之间取得平衡。核心流程与护栏如下：
+## Features
 
-1. 边界与护栏
+- ✅ **Intelligent Compression** - Advanced algorithms that balance file size and image quality
+- ✅ **Target Size Control** - Compress images to specific target file sizes in KB
+- ✅ **Multiple Formats** - Support for JPEG, PNG, and WebP formats
+- ✅ **Adaptive Quality** - Automatic quality adjustment to meet size requirements
+- ✅ **Dimension Control** - Optional maximum width/height constraints
+- ✅ **Batch Processing** - Efficient concurrent processing with semaphore control
+- ✅ **Isolate Execution** - Off-main-thread processing for smooth UI performance
+- ✅ **Pure Dart** - No native dependencies, works on all Flutter platforms
 
-- **目标字节阈值**：KB×1024，并设有下限；当目标 < 10KB 时提升至 10KB，避免平台编解码不稳定。
-- **已达标直接返回**：原图体积若 ≤ 目标，直接复制到临时目录返回（不改画质，qualityUsed=100）。
+## Problem Solved
 
-2. 近目标快速路径（nearTargetFactor）
+Traditional image compression often results in either poor quality at small file sizes or unnecessarily large files at high quality. This plugin uses intelligent algorithms to find the optimal balance, including:
 
-- 当原图体积 ≤ nearTargetFactor× 目标（默认 1.2）时，优先采用高保真快速搜索：
-  - **原生快速路径（如可用）**：仅对质量做二分，不缩放尺寸；命中即返回。
-  - **单次解码自适应搜索**：在 isolate 中一次解码，在内存里多次尝试；使用更高的最小质量下限 preferredMinQuality（默认 80）尽量保真。
-- **早停带**：当结果进入 earlyStopRatio× 目标（默认 95%）的区间，提前结束并返回。
+- Adaptive quality search with binary search optimization
+- Multi-dimensional scaling attempts (no resize, then progressive downscaling)
+- Early stop mechanisms when target size is achieved
+- Fallback strategies for edge cases
+- Concurrent processing limits to prevent resource exhaustion
 
-3. 原生快速路径（Android/iOS）
+## Installation
 
-- 不缩放尺寸，只对质量做少次二分（尝试次数有上限），命中即返回。
-- 支持 keepExif；但保留 EXIF 会增加体积、降低命中目标概率。
+Add this to your package's `pubspec.yaml` file:
 
-4. 单次解码 + 自适应搜索（isolate）
+```yaml
+dependencies:
+  high_effort_image_compress: ^1.0.0
+```
 
-- 仅解码一次到内存，后续所有质量/尺寸尝试均在内存中完成，避免重复 I/O。
-- **两点质量估算**：以质量 85 与 35 进行两次探测，线性估算“质量-体积”关系，得到可能命中的 q\* 并优先尝试其附近值。
-- 若估算显示需要过低质量才可达标，则先按估算比缩小长边，再在新尺寸上微调质量。
-- **维度候选**：从大到小逐步尝试；每个维度对质量采用二分，并设置每维最大尝试次数（maxAttemptsPerDim）与全局总尝试上限（maxTotalTrials）。
-- 始终选择“所有 ≤ 目标 的候选中体积最大者”；进入早停带即提前结束。
+Then run:
 
-5. 纯 Dart 兜底与最终强制收敛
+```bash
+flutter pub get
+```
 
-- 若前述路径仍未命中目标：
-  - 在更小维度上放宽最低质量（最低至 10）重新搜索；
-  - 仍未命中则执行最终强制收敛：以质量=1 并逐步减小长边，直至不超过目标体积。
-- 全过程只在最终结果时写盘，其余尝试均在内存中完成。
+## Usage
 
-6. 结果选择策略
+### Basic Usage
 
-- 若有“≤ 目标”的候选，返回其中体积最大者；否则返回整体体积最小者或进入强制收敛确保不超过目标。
+```dart
+import 'package:high_effort_image_compress/high_effort_image_compress.dart';
+import 'dart:io';
 
-7. EXIF 策略
+class ImageCompressor {
+  Future<void> compressImage() async {
+    final File imageFile = File('/path/to/your/image.jpg');
 
-- 默认 keepExif=false 以提高命中率与压缩比；开启后仅对 JPG 在原生路径有效，且不保证方向信息。
-- 纯 Dart 路径不保留 EXIF。
+    final result = await ImageCompressorService.compressToTarget(
+      imageFile,
+      options: ImageCompressorOptions(targetSizeInKB: 500), // 500KB target
+    );
 
-8. 并发与性能
+    print('Original size: ${imageFile.lengthSync()} bytes');
+    print('Compressed size: ${result.bytes} bytes');
+    print('Quality used: ${result.qualityUsed}%');
 
-- 使用信号量限制并发（按 CPU 核心数自适应，最大 3），避免资源争用与卡顿。
-- 计算密集部分放在 isolate 中执行，保持 UI 流畅；只在最终写出时进行磁盘 I/O。
+    // Use result.file for the compressed image
+    final compressedFile = result.file;
+  }
+}
+```
 
-9. 可调参数（默认值）
+### Advanced Configuration
 
-- initialQuality: 92；minQuality: 40；preferredMinQuality: 80；
-- earlyStopRatio: 0.95；nearTargetFactor: 1.2；
-- maxAttemptsPerDim: 5；maxTotalTrials: 24；
-- format: JPEG；keepExif: false（建议按需开启）。
+```dart
+final options = ImageCompressorOptions(
+  targetSizeInKB: 300,           // Target size in KB
+  initialQuality: 92,            // Starting quality (0-100)
+  minQuality: 40,                // Minimum quality (0-100)
+  maxWidth: 1920,                // Maximum width (optional)
+  maxHeight: 1080,               // Maximum height (optional)
+  format: CompressFormat.jpeg,   // Output format
+  earlyStopRatio: 0.95,          // Early stop when within 95% of target
+  nearTargetFactor: 1.2,         // Near-target optimization threshold
+  maxAttemptsPerDim: 5,          // Max attempts per dimension
+  maxTotalTrials: 24,            // Max total compression attempts
+);
 
-10. 目标与判断
+final result = await ImageCompressorService.compressToTarget(
+  imageFile,
+  options: options,
+);
+```
 
-- 当输出体积 ≤ 目标即视为命中；优先“更接近目标”的结果（更大但不超过）。
-- 目标单位：KB；换算为字节参与计算。
+### Different Output Formats
 
-11. 方向适配与布局注意
+```dart
+// JPEG compression (default)
+final jpegOptions = ImageCompressorOptions(
+  targetSizeInKB: 500,
+  format: CompressFormat.jpeg,
+);
 
-- 界面代码使用 EdgeInsetsDirectional/BorderRadiusDirectional 等以适配 LTR/RTL 双向布局。
+// PNG compression (lossless, may not achieve small sizes)
+final pngOptions = ImageCompressorOptions(
+  targetSizeInKB: 1000,
+  format: CompressFormat.png,
+);
 
-## 效果展示
+// WebP compression (falls back to JPEG in current implementation)
+final webpOptions = ImageCompressorOptions(
+  targetSizeInKB: 400,
+  format: CompressFormat.webp,
+);
+```
 
-<p align="left">
-  <img src="assets/images/demo1.png" width="400">
-</p>
+## API Reference
+
+### ImageCompressorService
+
+Static service class providing image compression functionality.
+
+#### Methods
+
+**compressToTarget(File sourceFile, {required ImageCompressorOptions options}) → Future\<ImageCompressorResult\>**
+
+Compresses an image file to meet the target size requirements using intelligent algorithms.
+
+- `sourceFile`: The source image file to compress
+- `options`: Compression configuration options
+
+Returns a `Future<ImageCompressorResult>` containing the compressed image data.
+
+### ImageCompressorOptions
+
+Configuration class for compression parameters.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `targetSizeInKB` | `int` | required | Target file size in KB |
+| `initialQuality` | `int` | `92` | Starting compression quality (0-100) |
+| `minQuality` | `int` | `40` | Minimum allowed quality (0-100) |
+| `maxWidth` | `int?` | `null` | Maximum image width (optional) |
+| `maxHeight` | `int?` | `null` | Maximum image height (optional) |
+| `format` | `CompressFormat` | `CompressFormat.jpeg` | Output image format |
+| `keepExif` | `bool` | `false` | Preserve EXIF data (JPEG only) |
+| `earlyStopRatio` | `double` | `0.95` | Stop when within ratio of target size |
+| `nearTargetFactor` | `double` | `1.2` | Near-target optimization threshold |
+| `preferredMinQuality` | `int` | `80` | Preferred minimum quality for near-target images |
+| `maxAttemptsPerDim` | `int` | `5` | Max attempts per dimension |
+| `maxTotalTrials` | `int` | `24` | Max total compression attempts |
+
+### ImageCompressorResult
+
+Result class containing compression outcome.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `file` | `File` | The compressed image file |
+| `bytes` | `int` | Size of compressed image in bytes |
+| `qualityUsed` | `int` | Quality setting used (0-100) |
+| `sizeInfo` | `SizeInfo` | Image dimension information |
+
+### CompressFormat
+
+Enum for supported compression formats.
+
+- `CompressFormat.jpeg` - JPEG format (recommended)
+- `CompressFormat.png` - PNG format (lossless)
+- `CompressFormat.webp` - WebP format (falls back to JPEG)
+
+### SizeInfo
+
+Class containing image dimension information.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `width` | `int?` | Image width in pixels |
+| `height` | `int?` | Image height in pixels |
+
+## Algorithm Details
+
+The compression algorithm uses a multi-stage approach:
+
+1. **Fast Path**: For images near target size, uses higher quality thresholds
+2. **Adaptive Search**: Binary search on quality with early stopping
+3. **Multi-dimensional**: Tries different resolutions if quality alone isn't sufficient
+4. **Fallback Strategies**: Progressive dimension reduction for difficult cases
+5. **Final Enforcement**: Quality=1 with smallest dimensions as last resort
+
+## Performance Considerations
+
+- Uses Dart isolates for off-main-thread processing
+- Implements semaphore-based concurrency control (max 3 concurrent operations)
+- Early stopping prevents unnecessary computation
+- Memory-efficient in-memory compression trials
+
+## Example
+
+See the [example](example/) directory for a complete sample application.
+
+```bash
+cd example
+flutter run
+```
+
+## Limitations
+
+- WebP encoding currently falls back to JPEG (image package limitation)
+- EXIF preservation is not yet implemented
+- Size information in results is currently placeholder
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Getting Started
+
+This project is a starting point for a Flutter
+[plug-in package](https://flutter.dev/to/develop-plugins),
+a specialized package that includes platform-specific implementation code for
+Android and/or iOS.
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+
+The plugin project was generated without specifying the `--platforms` flag, no platforms are currently supported.
+To add platforms, run `flutter create -t plugin --platforms <platforms> .` in this directory.
+You can also find a detailed instruction on how to add platforms in the `pubspec.yaml` at https://flutter.dev/to/pubspec-plugin-platforms.

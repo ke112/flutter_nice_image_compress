@@ -140,48 +140,48 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               if (_state.compressedFile != null) ...[const SizedBox(height: 12), _buildStatsCard(context)],
               const SizedBox(height: 20),
-              Row(
-                textDirection: dir,
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed:
-                          !_state.uploading && _state.originalFile != null
-                              ? () async {
-                                final String? err = await _state.upload(original: true);
-                                if (!mounted) return;
-                                if (err == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('上传成功')));
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
-                                }
-                              }
-                              : null,
-                      icon: const Icon(Icons.cloud_upload),
-                      label: const Text('上传原图'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed:
-                          !_state.uploading && _state.compressedFile != null
-                              ? () async {
-                                final String? err = await _state.upload(original: false);
-                                if (!mounted) return;
-                                if (err == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('上传成功')));
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
-                                }
-                              }
-                              : null,
-                      icon: const Icon(Icons.cloud_upload_outlined),
-                      label: const Text('上传压缩图'),
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   textDirection: dir,
+              //   children: [
+              //     Expanded(
+              //       child: ElevatedButton.icon(
+              //         onPressed:
+              //             !_state.uploading && _state.originalFile != null
+              //                 ? () async {
+              //                   final String? err = await _state.upload(original: true);
+              //                   if (!mounted) return;
+              //                   if (err == null) {
+              //                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('上传成功')));
+              //                   } else {
+              //                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+              //                   }
+              //                 }
+              //                 : null,
+              //         icon: const Icon(Icons.cloud_upload),
+              //         label: const Text('上传原图'),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 12),
+              //     Expanded(
+              //       child: ElevatedButton.icon(
+              //         onPressed:
+              //             !_state.uploading && _state.compressedFile != null
+              //                 ? () async {
+              //                   final String? err = await _state.upload(original: false);
+              //                   if (!mounted) return;
+              //                   if (err == null) {
+              //                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('上传成功')));
+              //                   } else {
+              //                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+              //                   }
+              //                 }
+              //                 : null,
+              //         icon: const Icon(Icons.cloud_upload_outlined),
+              //         label: const Text('上传压缩图'),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),

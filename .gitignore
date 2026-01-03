@@ -142,3 +142,36 @@ android/gradle/wrapper/dists/
 # ========== 测试/示例冗余文件 ==========
 test/resources/large_assets/
 example/assets/temp/
+
+# ========== Dart核心无用文件 ==========
+.dart_tool/
+pubspec.lock
+build/
+*.dart.snapshot
+*.log
+
+# ========== 编辑器/系统无用文件 ==========
+.vscode/
+*.code-workspace
+.idea/
+*.iml
+out/
+.DS_Store
+Thumbs.db
+Desktop.ini
+tmp/
+temp/
+*.tmp
+
+# ========== Flutter相关无用文件 ==========
+.flutter-plugins
+.flutter-plugins-dependencies
+ios/Runner/DerivedData/
+ios/Pods/
+android/app/build/
+android/build/
+android/gradle/wrapper/dists/
+
+# ========== 测试/示例冗余文件 ==========
+test/resources/large_assets/
+example/assets/temp/

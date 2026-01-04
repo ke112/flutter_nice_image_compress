@@ -1,0 +1,30 @@
+# Files and directories to exclude from publishing to pub.dev
+
+# Development files
+.gitignore
+pubspec.lock
+analysis_options.yaml
+CHANGELOG.md
+
+# Example app specific files (optional - remove if you want to include example)
+example/pubspec.lock
+example/.dart_tool/
+example/build/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Build artifacts
+build/
+.dart_tool/

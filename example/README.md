@@ -1,6 +1,6 @@
-# flutter_nice_image_compress_example
+# nice_image_compress_example
 
-Demonstrates how to use the flutter_nice_image_compress plugin.
+Demonstrates how to use the nice_image_compress plugin.
 
 ## Getting Started
 

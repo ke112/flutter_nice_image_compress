@@ -1,6 +1,6 @@
-# flutter_nice_image_compress
+# nice_image_compress
 
-[![pub package](https://img.shields.io/pub/v/flutter_nice_image_compress.svg)](https://pub.dev/packages/flutter_nice_image_compress)
+[![pub package](https://img.shields.io/pub/v/nice_image_compress.svg)](https://pub.dev/packages/nice_image_compress)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A powerful Flutter plugin for advanced image compression with intelligent algorithms that balance size and quality.
@@ -34,7 +34,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_nice_image_compress: ^1.0.0
+  nice_image_compress: ^1.0.0
 ```
 
 Then run:
@@ -48,7 +48,7 @@ flutter pub get
 ### Basic Usage
 
 ```dart
-import 'package:flutter_nice_image_compress/flutter_nice_image_compress.dart';
+import 'package:nice_image_compress/nice_image_compress.dart';
 import 'dart:io';
 
 class ImageCompressor {

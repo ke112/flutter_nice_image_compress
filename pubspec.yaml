@@ -1,5 +1,5 @@
 name: nice_image_compress
-version: 1.0.0
+version: 1.0.1
 description: A powerful Flutter plugin for advanced image compression with intelligent algorithms that balance size and quality.
 homepage: https://github.com/ke112
 repository: https://github.com/ke112/flutter_nice_image_compress
